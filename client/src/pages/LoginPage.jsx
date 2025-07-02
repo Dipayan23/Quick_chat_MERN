@@ -1,15 +1,18 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useState } from "react";
 import assets from "../assets/assets";
+import { AuthContext } from "../../context/authContext";
 
 const LoginPage = () => {
   const [currState, setCurrState] = useState("Sign up");
 
-  const [fullName, setFullName] = useState("");
+  const [fullname, setFullname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [bio, setBio] = useState("");
   const [isDataSubmitted, setIsDataSubmitted] = useState(false);
+
+  const {login}=useContext(AuthContext)
 
   const onSubmitHandler = (e) => {
     e.preventDefault();
@@ -17,6 +20,12 @@ const LoginPage = () => {
       setIsDataSubmitted(true);
       return;
     }
+    if(currState=="Sign up"){
+      login('signup',{fullname,email,password,bio})
+    }else{
+      login('login',{fullname,email,password,bio})
+    }
+   
   }
 
   return (
@@ -39,8 +48,8 @@ const LoginPage = () => {
 
         {currState === "Sign up" && !isDataSubmitted && (
           <input
-            onChange={(e) => setFullName(e.target.value)}
-            value={fullName}
+            onChange={(e) => setFullname(e.target.value)}
+            value={fullname}
             type="text"
             className="p-2 border border-gray-500 rounded-md focus:outline-none"
             placeholder="Full Name"

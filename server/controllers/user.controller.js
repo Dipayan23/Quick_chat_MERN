@@ -7,8 +7,9 @@ import cloudinary from "../lib/cloudinary.js";
 // Sign Up function
 
 export const signUp = async (req, res) => {
-  const { fullname, email, password, bio } = req.body;
+  
   try {
+    const { fullname, email, password, bio } =req.body;
     if (!fullname || !email || !password || !bio) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -59,9 +60,10 @@ export const login = async (req, res) => {
         
 
         const token = generateToken(userData._id);
-         res.cookie('token', token);
+        res.cookie('token', token);
+
         res.status(200).json({
-            userData,
+            userData:userData,
             token,
             message: "Login successful",
         });
@@ -89,6 +91,8 @@ export const checkAuth = async (req, res) => {
 export const updateProfile = async (req, res) => {
     try {
         const { fullname, profilePic, bio } = req.body;
+        console.log(req.body);
+        
         const userId = req.user._id;
         let updatedUser;
         if (!profilePic){

@@ -1,10 +1,14 @@
-import React from "react"; // Import React library
+import React, { useContext } from "react"; // Import React library
 import assets, { userDummyData } from "../assets/assets"; // Import assets and dummy user data
 import { useNavigate } from "react-router-dom"; // Import navigation hook
+import { AuthContext } from "../../context/authContext";
 
 // Sidebar component receives selectedUser and setSelectedUser as props
 const Sidebar = ({ selectedUser, setSelectedUser }) => {
   const navigate = useNavigate(); // Initialize navigation function
+
+  const {logout}=useContext(AuthContext)
+
 
   return (
     <div
@@ -35,7 +39,7 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
               </p>
               <hr className="my-2 border-t border-grey-500" />
               {/* Logout option */}
-              <p className="cursor-pointer text-sm">Logout</p>
+              <p onClick={()=>logout()} className="cursor-pointer text-sm">Logout</p>
             </div>
           </div>
         </div>

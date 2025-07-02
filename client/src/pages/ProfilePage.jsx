@@ -1,22 +1,42 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import assets from "../assets/assets";
+import { AuthContext } from "../../context/authContext";
+
+
 
 const ProfilePage = () => {
+  const {authUser, updateProfile} = useContext(AuthContext);
+
   const [selectedImage, setSelectedImage] = useState(null);
-  const [bio, setBio] = useState("Hey Everyone I am using Quick Chat");
-  const [name, setName] = useState("John Doe");
+  const [bio, setBio] = useState(authUser.bio);
+  const [name, setName] = useState(authUser.fullname);
   const navigate = useNavigate();
 
-  const onSubmitHandler = (e) => {
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
-    navigate("/");
-  }
+    if (!selectedImage) {
+      await updateProfile({ fullname: name, bio });
+      navigate("/");
+      return;
+    }
+    const reader = new FileReader();
+    reader.readAsDataURL(selectedImage);
+    reader.onload = async () => {
+      const base64Image = reader.result;
+      await updateProfile({ ProfilePic: base64Image, fullname: name, bio });
+      navigate("/");
+      return;
+    };
+  };
 
   return (
     <div className="min-h-screen bg-cover bg-no-repeat flex items-center justify-center">
       <div className="w-5/6 max-w-2x1 backdrop-blur-2x1 text-gray-300 border-2 border-gray-600 flex items-center justify-between max-sm:flex-col-reverse rounded-1g">
-        <form onSubmit={onSubmitHandler} className="flex flex-col gap-5 p-10 flex-1">
+        <form
+          onSubmit={onSubmitHandler}
+          className="flex flex-col gap-5 p-10 flex-1"
+        >
           <h3 className="text-lg">Profile details</h3>
           <label
             htmlFor="avatar"
@@ -66,7 +86,11 @@ const ProfilePage = () => {
           </button>
         </form>
 
-        <img src={assets.logo_icon} className="max-w-44 aspect-square rounded-full mx-10 max-sm:mt-10" alt="" />
+        <img
+          src={assets.logo_icon}
+          className={` max-w-44 aspect-square rounded-full mx-10 max-sm:mt-10 ${selectedImage && 'rounded-full'}`}
+          alt=""
+        />
       </div>
     </div>
   );
