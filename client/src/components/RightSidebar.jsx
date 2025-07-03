@@ -1,7 +1,20 @@
-import React from "react";
+import React, { useContext,useEffect,useState } from "react";
 import assets, { imagesDummyData } from "../assets/assets";
+import { ChatContext } from "../../context/chatContext";
+import { AuthContext } from "../../context/authContext";
 
-const RightSidebar = ({ selectedUser }) => {
+const RightSidebar = () => {
+
+  const {selectedUser,messages}=useContext(ChatContext);
+  const {logout,onlineUsers}=useContext(AuthContext);
+  const [msgImages, setMsgImages] = useState([])
+
+  //Get all images from message and store in message array
+
+  useEffect(()=>{
+    setMsgImages(messages.filter(msg=>msg.image).map(msg=>msg.image))
+  },[messages])
+
   return (
     selectedUser && (
       <div
@@ -16,8 +29,8 @@ const RightSidebar = ({ selectedUser }) => {
             className="w-20 aspect-[1/1] rounded-full"
           />
           <h1 className="px-10 text-xl font-medium mx-auto flex items-center gap-2">
-            <p className="w-2 h-2 rounded-full bg-green-500"></p>
-            {selectedUser?.fullName}
+            {onlineUsers.includes(selectedUser._id)&&<p className="w-2 h-2 rounded-full bg-green-500"></p>}
+            {selectedUser?.fullname}
           </h1>
           <p className="px-10 mx-auto">{selectedUser.bio}</p>
         </div>
@@ -25,7 +38,7 @@ const RightSidebar = ({ selectedUser }) => {
         <div className="px-5 text-xs">
           <p>Media</p>
           <div className="mt-2 max-h-[200px] overflow-y-scroll grid grid-cols-2 gap-4 opacity-80">
-            {imagesDummyData.map((image, index) => (
+            {msgImages.map((image, index) => (
               <div
                 className="cursor-pointer rounded"
                 key={index}
@@ -36,7 +49,7 @@ const RightSidebar = ({ selectedUser }) => {
             ))}
           </div>
         </div>
-        <button className="absolute bottom-5 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-100 to-violet-600 text-white border-none text-sm font-light py-2 px-20 rounded-full cursor-pointer">
+        <button onClick={()=>logout()} className="absolute bottom-5 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-100 to-violet-600 text-white border-none text-sm font-light py-2 px-20 rounded-full cursor-pointer">
           Logout
         </button>
       </div>

@@ -1,14 +1,37 @@
-import React, { useContext } from "react"; // Import React library
-import assets, { userDummyData } from "../assets/assets"; // Import assets and dummy user data
+import React, { useContext, useEffect, useState } from "react"; // Import React library
+import assets from "../assets/assets"; // Import assets and dummy user data
 import { useNavigate } from "react-router-dom"; // Import navigation hook
 import { AuthContext } from "../../context/authContext";
+import { ChatContext } from "../../context/chatContext";
 
 // Sidebar component receives selectedUser and setSelectedUser as props
-const Sidebar = ({ selectedUser, setSelectedUser }) => {
+const Sidebar = () => {
+  const {
+    getUsers,
+    users,
+    selectedUser,
+    setSelectedUser,
+    unseenMessages,
+    setUnseenMessages,
+  } = useContext(ChatContext);
+
   const navigate = useNavigate(); // Initialize navigation function
 
-  const {logout}=useContext(AuthContext)
+  const { logout, onlineUsers } = useContext(AuthContext);
 
+  const [input, setInput] = useState(false);
+
+  const filteredUsers = input
+    ? users.filter((user) => {
+        user.fullName.toLowerCase().includes(input.toLowerCase());
+      })
+    : users;
+
+  useEffect(() => {
+    getUsers();
+  }, [onlineUsers]);
+
+  
 
   return (
     <div
@@ -39,7 +62,9 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
               </p>
               <hr className="my-2 border-t border-grey-500" />
               {/* Logout option */}
-              <p onClick={()=>logout()} className="cursor-pointer text-sm">Logout</p>
+              <p onClick={() => logout()} className="cursor-pointer text-sm">
+                Logout
+              </p>
             </div>
           </div>
         </div>
@@ -47,6 +72,7 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
         <div className="bg-[#282142] rounded-full flex items-center gap-2 py-3 px-4 mt-5">
           <img src={assets.search_icon} alt="Search" className="w-3" />
           <input
+            onChange={(e) => setInput(e.target.value)}
             type="text"
             placeholder="Search User..."
             className="bg-transparent border-none outline-none text-white text-xs placeholder-[#c8c8c8] flex-1"
@@ -55,11 +81,12 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
       </div>
       {/* User list */}
       <div className="flex flex-col">
-        {userDummyData.map((user, index) => (
+        {filteredUsers.map((user, index) => (
           <div
             key={index} // Unique key for each user
             onClick={() => {
-              setSelectedUser(user); // Set selected user on click
+              setSelectedUser(user);
+              setUnseenMessages(prev=>({...prev,[user._id]:0})) // Set selected user on click
             }}
             // Highlight selected user
             className={`relative flex items-center gap-2 p-2 pl-4 rounded-cursor-pointer max-sm:text-sm ${
@@ -74,18 +101,21 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
             />
             {/* User name and status */}
             <div className="flex flex-col leading-5">
-              <p>{user.fullName}</p>
+              <p>{user.fullname}</p>
               {/* Show 'Online' for first 3 users */}
-              {index < 3 ? (
+              { onlineUsers.includes(user._id) 
+              ? (
                 <span className="text-green-400 text-xs">Online</span>
               ) : (
-                <span className="text-neutral-400 text-xs"></span>
+                <span className="text-neutral-400 text-xs">Offline</span>
               )}
             </div>
             {/* Show badge for users after the first 3 */}
-            {index > 2 && (
+            {unseenMessages[user._id] > 0 && (
               <p className="absolute top-4 right-4 text-xs h-5 w-5 flex justify-center items-center rounded-full bg-violet-500/50">
-                {index}
+                {unseenMessages[user._id]}
+                
+                
               </p>
             )}
           </div>

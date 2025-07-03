@@ -91,7 +91,7 @@ export const checkAuth = async (req, res) => {
 export const updateProfile = async (req, res) => {
     try {
         const { fullname, profilePic, bio } = req.body;
-        console.log(req.body);
+        console.log(profilePic);
         
         const userId = req.user._id;
         let updatedUser;

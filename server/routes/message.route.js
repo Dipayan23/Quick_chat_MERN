@@ -10,6 +10,6 @@ messageRouter.get('/:id', protectRoute, getMessages);
 // Mark messages as seen
 messageRouter.put('/seen/:id', protectRoute, markMessageAsSeen);
 // send message to a user
-messageRouter.post('/:id', protectRoute, sendMessage);
+messageRouter.post('/send/:id', protectRoute, sendMessage);
 
 export default messageRouter;

@@ -13,7 +13,7 @@ const app = express();
 const server = http.createServer(app);
 
 // Setting up Socket.io
-const io = new Server(server, {
+export const io = new Server(server, {
   cors: {
     origin: "*",
   },
@@ -30,7 +30,7 @@ io.on("connection", (socket) => {
     userSocketMap[userId] = socket.id; // Store the socket ID for the user
   }
   // Emit online users to all clients
-  io.emit("onlineUsers", Object.keys(userSocketMap));
+  io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
   socket.on("disconnect", () => {
     console.log(`User disconnected: ${userId}`);

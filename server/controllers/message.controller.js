@@ -1,7 +1,7 @@
 import User from "../models/user.models.js";
 import Message from "../models/message.models.js";
 import cloudinary from "../lib/cloudinary.js";
-import { userSocketMap } from "../server.js"; // Import the userSocketMap from server.js
+import {io, userSocketMap } from "../server.js"; // Import the userSocketMap from server.js
 
 // Get all users except the logged-in user
 export const getAllUsers = async (req, res) => {
@@ -54,7 +54,7 @@ export const getMessages = async (req, res) => {
       { $set: { seen: true } }
     );
 
-    res.status(200).json(messages);
+    res.status(200).json({messages});
   } catch (error) {
     console.log(error.message);
     res
@@ -85,6 +85,8 @@ export const sendMessage = async (req, res) => {
     const { image, text } = req.body;
     const myUserId = req.user._id;
     const { id: selectedUserId } = req.params;
+    console.log(text);
+    
 
     if (!text && !image) {
       return res
@@ -108,10 +110,10 @@ export const sendMessage = async (req, res) => {
     // Emit the new message to the receiver's socket if they are online
     const receiverSocketId = userSocketMap[selectedUserId];
     if (receiverSocketId) {
-      req.io.to(receiverSocketId).emit("newMessage", newMessage);
+      io.to(receiverSocketId).emit("newMessage", newMessage);
     }
 
-    res.status(201).json(newMessage);
+    res.status(201).json({newMessage});
   } catch (error) {
     console.log(error.message);
     res
